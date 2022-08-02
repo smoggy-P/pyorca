@@ -28,17 +28,23 @@ import pygame
 import itertools
 import random
 
-N_AGENTS = 8
+# Config
+N_AGENTS = 10
 RADIUS = 8.
-SPEED = 10
+MAX_SPEED = 10
 
-agents = []
-for i in range(N_AGENTS):
-    theta = 2 * pi * i / N_AGENTS
-    x = RADIUS * array((cos(theta), sin(theta))) #+ random.uniform(-1, 1)
-    vel = normalized(-x) * SPEED
-    pos = (random.uniform(-20, 20), random.uniform(-20, 20))
-    agents.append(Agent(pos, (0., 0.), 1., SPEED, vel))
+def init_agents():
+    agents = []
+    for i in range(N_AGENTS):
+        theta = 2 * pi * i / N_AGENTS
+        x = RADIUS * array((cos(theta), sin(theta))) #+ random.uniform(-1, 1)
+        vel = normalized(-x) * MAX_SPEED
+        pos = (random.uniform(-20, 20), random.uniform(-20, 20))
+        agents.append(Agent(pos, (0., 0.), 1., MAX_SPEED, vel))
+    return agents
+
+agents = init_agents()
+
 
 
 colors = [
@@ -98,8 +104,8 @@ while running:
 
     screen.fill(pygame.Color(0, 0, 0))
 
-    for agent in agents[1:]:
-        draw_orca_circles(agents[0], agent)
+    # for agent in agents[1:]:
+    #     draw_orca_circles(agents[0], agent)
 
     for agent, color in zip(agents, itertools.cycle(colors)):
         draw_agent(agent, color)
@@ -110,12 +116,12 @@ while running:
         # Draw ORCA line
         alpha = agents[0].position + line.point + perp(line.direction) * 100
         beta = agents[0].position + line.point + perp(line.direction) * -100
-        pygame.draw.line(screen, (255, 255, 255), rint(alpha * scale + O).astype(int), rint(beta * scale + O).astype(int), 1)
+        # pygame.draw.line(screen, (255, 255, 255), rint(alpha * scale + O).astype(int), rint(beta * scale + O).astype(int), 1)
 
         # Draw normal to ORCA line
         gamma = agents[0].position + line.point
         delta = agents[0].position + line.point + line.direction
-        pygame.draw.line(screen, (255, 255, 255), rint(gamma * scale + O).astype(int), rint(delta * scale + O).astype(int), 1)
+        # pygame.draw.line(screen, (255, 255, 255), rint(gamma * scale + O).astype(int), rint(delta * scale + O).astype(int), 1)
 
     pygame.display.flip()
 

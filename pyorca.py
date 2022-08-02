@@ -130,7 +130,7 @@ def get_avoidance_velocity(agent, collider, t, dt):
                 ((leg_len, sine),
                 (-sine, leg_len)))
             rotated_x = rot.dot(x) / x_len_sq
-                n = perp(rotated_x)
+            n = perp(rotated_x)
             if sine < 0:
                 # Need to flip the direction of the line to make the
                 # half-plane point out of the cone.
