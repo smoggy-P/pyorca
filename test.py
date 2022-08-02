@@ -21,26 +21,41 @@
 
 from __future__ import division
 
+from sqlalchemy import false, true
+
 from pyorca import Agent, get_avoidance_velocity, orca, normalized, perp
 from numpy import array, rint, linspace, pi, cos, sin
+from numpy.linalg import norm
+
 import pygame
 
 import itertools
 import random
 
 # Config
-N_AGENTS = 10
+N_AGENTS = 20
 RADIUS = 8.
 MAX_SPEED = 10
 
+def check_collision(agents, agent):
+    for agent_ in agents:
+        if norm(agent_.position - agent.position) <= agent_.radius + agent.radius:
+            return False
+    return True
+    
+
 def init_agents():
     agents = []
-    for i in range(N_AGENTS):
+    i = 0
+    while(i <= N_AGENTS):
         theta = 2 * pi * i / N_AGENTS
         x = RADIUS * array((cos(theta), sin(theta))) #+ random.uniform(-1, 1)
         vel = normalized(-x) * MAX_SPEED
         pos = (random.uniform(-20, 20), random.uniform(-20, 20))
-        agents.append(Agent(pos, (0., 0.), 1., MAX_SPEED, vel))
+        new_agent = Agent(pos, (0., 0.), 1., MAX_SPEED, vel)
+        if check_collision(agents, new_agent):
+            agents.append(new_agent)
+            i += 1
     return agents
 
 agents = init_agents()
