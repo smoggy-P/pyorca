@@ -33,9 +33,9 @@ import itertools
 import random
 
 # Config
-N_AGENTS = 20
+N_AGENTS = 15
 RADIUS = 8.
-MAX_SPEED = 10
+MAX_SPEED = 4
 
 def check_collision(agents, agent):
     for agent_ in agents:
@@ -76,7 +76,7 @@ pygame.init()
 dim = (640, 480)
 screen = pygame.display.set_mode(dim)
 
-O = array(dim) / 2  # Screen position of origin.
+origin = array(dim) / 2  # Screen position of origin.
 scale = 6  # Drawing scale.
 
 clock = pygame.time.Clock()
@@ -85,16 +85,16 @@ dt = 1/FPS
 tau = 5
 
 def draw_agent(agent, color):
-    pygame.draw.circle(screen, color, rint(agent.position * scale + O).astype(int), int(round(agent.radius * scale)), 0)
+    pygame.draw.circle(screen, color, rint(agent.position * scale + origin).astype(int), int(round(agent.radius * scale)), 0)
 
 def draw_orca_circles(a, b):
     for x in linspace(0, tau, 21):
         if x == 0:
             continue
-        pygame.draw.circle(screen, pygame.Color(0, 0, 255), rint((-(a.position - b.position) / x + a.position) * scale + O).astype(int), int(round((a.radius + b.radius) * scale / x)), 1)
+        pygame.draw.circle(screen, pygame.Color(0, 0, 255), rint((-(a.position - b.position) / x + a.position) * scale + origin).astype(int), int(round((a.radius + b.radius) * scale / x)), 1)
 
 def draw_velocity(a):
-    pygame.draw.line(screen, pygame.Color(0, 255, 255), rint(a.position * scale + O).astype(int), rint((a.position + a.velocity) * scale + O).astype(int), 1)
+    pygame.draw.line(screen, pygame.Color(0, 255, 255), rint(a.position * scale + origin).astype(int), rint((a.position + a.velocity) * scale + origin).astype(int), 1)
     # pygame.draw.line(screen, pygame.Color(255, 0, 255), rint(a.position * scale + O).astype(int), rint((a.position + a.pref_velocity) * scale + O).astype(int), 1)
 
 running = True
@@ -109,18 +109,18 @@ while running:
         new_vels = [None] * len(agents)
         for i, agent in enumerate(agents):
             candidates = agents[:i] + agents[i + 1:]
-            # print(candidates)
             new_vels[i], all_lines[i] = orca(agent, candidates, tau, dt)
-            # print(i, agent.velocity)
 
         for i, agent in enumerate(agents):
             agent.velocity = new_vels[i]
             agent.position += agent.velocity * dt
+            real_pos = agent.position * scale + origin
+            if real_pos[0] < 0 or real_pos[0] > dim[0]:
+                agent.velocity[0] = -agent.velocity[0]
+            if real_pos[1] < 0 or real_pos[1] > dim[1]:
+                agent.velocity[1] = -agent.velocity[1]
 
     screen.fill(pygame.Color(0, 0, 0))
-
-    # for agent in agents[1:]:
-    #     draw_orca_circles(agents[0], agent)
 
     for agent, color in zip(agents, itertools.cycle(colors)):
         draw_agent(agent, color)
